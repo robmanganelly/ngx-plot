@@ -3,6 +3,8 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
+  inject,
+  Renderer2,
   signal,
   viewChild,
 } from '@angular/core';
@@ -16,12 +18,18 @@ interface TemperatureReading {
 @Component({
   selector: 'app-plot-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-  <div class="grid grid-cols-2 gap-4">
+  template: ` <div class="grid grid-cols-2 gap-4">
     <div #plotContainer></div>
-    <div >
+    <div>
       <span> this is the details view</span>
-
+    </div>
+    <div class="grid-cols-2 flex gap-4">
+      <button class="border rounded-sm px-2 py-1" (click)="addOne()">
+        Add One
+      </button>
+      <button class="border rounded-sm px-2 py-1" (click)="removeLast()">
+        Remove Last
+      </button>
     </div>
   </div>`,
 
@@ -33,6 +41,8 @@ interface TemperatureReading {
   `,
 })
 export class PlotPage {
+  private readonly renderer = inject(Renderer2);
+
   readonly plotContainer =
     viewChild.required<ElementRef<HTMLDivElement>>('plotContainer');
 
@@ -52,6 +62,23 @@ export class PlotPage {
     { date: new Date('2026-02-13'), temperature: 5 },
     { date: new Date('2026-02-14'), temperature: 7 },
   ]);
+
+  addOne() {
+    const lastDate = this.temperatureData().slice(-1)[0].date;
+    const newDate = new Date(lastDate);
+    newDate.setDate(lastDate.getDate() + 1);
+    const newTemp = Math.round(Math.random() * 10) + 3;
+    this.temperatureData.update((data) => [
+      ...data,
+      { date: newDate, temperature: newTemp },
+    ]);
+  }
+
+  removeLast() {
+    this.temperatureData.update((data) =>
+      data.length - 1 ? data.slice(0, -1) : data,
+    );
+  }
 
   constructor() {
     afterRenderEffect(() => {
@@ -79,8 +106,10 @@ export class PlotPage {
         ],
       });
 
-      container.firstChild?.remove();
-      container.append(plot);
+      if (container.firstChild) {
+        this.renderer.removeChild(container, container.firstChild);
+      }
+      this.renderer.appendChild(container, plot);
     });
   }
 }
