@@ -9,6 +9,7 @@ import {
   viewChild,
 } from '@angular/core';
 import * as Plot from '@observablehq/plot';
+import { data } from './data';
 
 interface TemperatureReading {
   date: Date;
@@ -16,12 +17,17 @@ interface TemperatureReading {
 }
 
 @Component({
-  selector: 'app-plot-page',
+  selector: 'app-temperature-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: ` <div class="grid grid-cols-2 gap-4">
     <div #plotContainer></div>
     <div>
-      <span> this is the details view</span>
+      @if (selectedReading(); as reading) {
+        <p><strong>Day:</strong> {{ reading.date.toLocaleDateString() }}</p>
+        <p><strong>Temperature:</strong> {{ reading.temperature }}°C</p>
+      } @else {
+        <span>Click a data point to see details</span>
+      }
     </div>
     <div class="grid-cols-2 flex gap-4">
       <button class="border rounded-sm px-2 py-1" (click)="addOne()">
@@ -40,28 +46,15 @@ interface TemperatureReading {
     }
   `,
 })
-export class PlotPage {
+export class TemperaturePage {
   private readonly renderer = inject(Renderer2);
 
   readonly plotContainer =
     viewChild.required<ElementRef<HTMLDivElement>>('plotContainer');
 
-  readonly temperatureData = signal<TemperatureReading[]>([
-    { date: new Date('2026-02-01'), temperature: 3 },
-    { date: new Date('2026-02-02'), temperature: 5 },
-    { date: new Date('2026-02-03'), temperature: 2 },
-    { date: new Date('2026-02-04'), temperature: 7 },
-    { date: new Date('2026-02-05'), temperature: 8 },
-    { date: new Date('2026-02-06'), temperature: 6 },
-    { date: new Date('2026-02-07'), temperature: 4 },
-    { date: new Date('2026-02-08'), temperature: 9 },
-    { date: new Date('2026-02-09'), temperature: 11 },
-    { date: new Date('2026-02-10'), temperature: 10 },
-    { date: new Date('2026-02-11'), temperature: 8 },
-    { date: new Date('2026-02-12'), temperature: 6 },
-    { date: new Date('2026-02-13'), temperature: 5 },
-    { date: new Date('2026-02-14'), temperature: 7 },
-  ]);
+  readonly selectedReading = signal<TemperatureReading | null>(null);
+
+  readonly temperatureData = signal<TemperatureReading[]>(data);
 
   addOne() {
     const lastDate = this.temperatureData().slice(-1)[0].date;
@@ -81,7 +74,7 @@ export class PlotPage {
   }
 
   constructor() {
-    afterRenderEffect(() => {
+    afterRenderEffect((onCleanup) => {
       const container = this.plotContainer().nativeElement;
       const data = this.temperatureData();
 
@@ -97,12 +90,22 @@ export class PlotPage {
             stroke: 'steelblue',
             strokeWidth: 2,
           }),
+          Plot.dot(data, Plot.pointer({
+            x: 'date',
+            y: 'temperature',
+            fill: 'steelblue',
+            r: 8,
+          })),
           Plot.dot(data, {
             x: 'date',
             y: 'temperature',
             fill: 'steelblue',
-            r: 3,
+            r: 4,
           }),
+          Plot.tip(data, Plot.pointer({
+            x: 'date',
+            y: 'temperature',
+          })),
         ],
       });
 
@@ -110,6 +113,20 @@ export class PlotPage {
         this.renderer.removeChild(container, container.firstChild);
       }
       this.renderer.appendChild(container, plot);
+
+      // Use Plot's official "input" event — emitted by the pointer transform
+      // when the focused point changes. plot.value holds the focused datum.
+      // Click-to-stick is built-in: clicking locks the selection.
+      const unlisten = this.renderer.listen(
+        plot,
+        'input',
+        () => {
+          const datum = (plot as unknown as { value: TemperatureReading | null }).value;
+          this.selectedReading.set(datum ?? null);
+        },
+      );
+
+      onCleanup(() => unlisten());
     });
   }
 }

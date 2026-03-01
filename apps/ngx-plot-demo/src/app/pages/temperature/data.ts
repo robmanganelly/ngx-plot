@@ -1,0 +1,16 @@
+export const data = [
+  { date: new Date('2026-02-01'), temperature: 3 },
+  { date: new Date('2026-02-02'), temperature: 5 },
+  { date: new Date('2026-02-03'), temperature: 2 },
+  { date: new Date('2026-02-04'), temperature: 7 },
+  { date: new Date('2026-02-05'), temperature: 8 },
+  { date: new Date('2026-02-06'), temperature: 6 },
+  { date: new Date('2026-02-07'), temperature: 4 },
+  { date: new Date('2026-02-08'), temperature: 9 },
+  { date: new Date('2026-02-09'), temperature: 11 },
+  { date: new Date('2026-02-10'), temperature: 10 },
+  { date: new Date('2026-02-11'), temperature: 8 },
+  { date: new Date('2026-02-12'), temperature: 6 },
+  { date: new Date('2026-02-13'), temperature: 5 },
+  { date: new Date('2026-02-14'), temperature: 7 },
+];
