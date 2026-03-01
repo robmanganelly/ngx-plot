@@ -19,7 +19,7 @@ import { Capital, CAPITALS } from './data';
   selector: 'app-plot-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="grid grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 gap-4">
       <div #plotContainer class="col-span-2"></div>
       <div class="p-4">
         <h3 class="text-lg font-semibold mb-2">Details</h3>
@@ -66,7 +66,7 @@ export class PlotPage {
       const container = this.plotContainer().nativeElement;
 
       const plot = Plot.plot({
-        projection: 'mercator',
+        projection: 'equirectangular',
         width: 900,
         height: 500,
         marks: [

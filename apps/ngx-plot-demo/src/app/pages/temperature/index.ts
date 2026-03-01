@@ -19,7 +19,7 @@ interface TemperatureReading {
 @Component({
   selector: 'app-temperature-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: ` <div class="grid grid-cols-2 gap-4">
+  template: ` <div class="grid grid-cols-1 gap-4">
     <div #plotContainer></div>
     <div>
       @if (selectedReading(); as reading) {

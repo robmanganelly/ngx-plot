@@ -6,8 +6,8 @@ export const appRoutes: Route[] = [{
     redirectTo: 'temperature'
 },{
     path: 'temperature',
-    loadComponent: () => import('./pages/temperature/temperature').then(m => m.TemperaturePage)
+    loadComponent: () => import('./pages/temperature').then(m => m.TemperaturePage)
 }, {
     path: 'capitals',
-    loadComponent: () => import('./pages/capitals/plots').then(m => m.PlotPage)
+    loadComponent: () => import('./pages/capitals').then(m => m.PlotPage)
 }];
