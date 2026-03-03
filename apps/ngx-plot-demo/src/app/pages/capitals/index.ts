@@ -49,7 +49,7 @@ export class PlotPage {
   readonly land = signal<GeoJSON.FeatureCollection | null>(null);
 
   constructor() {
-    fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/land-110m.json')
+    fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json')
       .then((res) => res.json())
       .then((topology: Topology) => {
         const geojson = topojson.feature(
@@ -66,7 +66,7 @@ export class PlotPage {
       const container = this.plotContainer().nativeElement;
 
       const plot = Plot.plot({
-        projection: 'equirectangular',
+        projection: 'equal-earth',
         width: 900,
         height: 500,
         marks: [

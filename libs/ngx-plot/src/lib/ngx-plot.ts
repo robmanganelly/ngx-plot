@@ -1,10 +1,25 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  inject,
+  Renderer2,
+  viewChild,
+} from '@angular/core';
 
 @Component({
-  selector: 'ngx-plot-ngx-plot',
+  selector: 'ngx-plot-frame',
   imports: [],
-  template: `<p>NgxPlot works!</p>`,
+  host: {
+    class: 'contents',
+  },
+  template: ` <div #plotframe></div> `,
   styles: ``,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NgxPlot {}
+export class NgxPlot {
+  private readonly r2 = inject(Renderer2);
+
+  private readonly plotframe =
+    viewChild.required<ElementRef<HTMLDivElement>>('plotframe');
+}
